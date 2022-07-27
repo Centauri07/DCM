@@ -21,3 +21,16 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.stefan9110.dcm'
+            artifactId = 'DCM'
+            version = 'v1.0-alpha'
+
+            from components.java
+        }
+    }
+}
+
