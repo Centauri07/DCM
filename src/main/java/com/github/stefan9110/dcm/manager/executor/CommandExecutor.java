@@ -18,15 +18,19 @@ package com.github.stefan9110.dcm.manager.executor;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public abstract class CommandExecutor implements Executor {
-    public abstract void execute(Member member, String[] args, GuildMessageReceivedEvent event);
+    public abstract void execute(Member member, String[] args, MessageReceivedEvent event);
 
     /* Cast Event -> GuildMessageReceivedEvent
      * CommandExecutor#onCommand() is only called with GuildMessageReceivedEvent as parameter */
     @Override
     public final void onCommand(Member member, String[] args, Event event) {
-        execute(member, args, (GuildMessageReceivedEvent) event);
+
+        if (!((MessageReceivedEvent) event).isFromGuild()) return;
+
+        execute(member, args, (MessageReceivedEvent) event);
+
     }
 }

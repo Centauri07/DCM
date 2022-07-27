@@ -19,19 +19,19 @@ package com.github.stefan9110.dcm.manager.executor;
 import com.github.stefan9110.dcm.manager.executor.reply.InteractionResponse;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class SlashExecutor implements Executor {
-    public void execute(Member member, String[] args, SlashCommandEvent event, InteractionHook hook) {
+    public void execute(Member member, String[] args, SlashCommandInteractionEvent event, InteractionHook hook) {
 
     }
 
     /**
      * @return InteractionResponse instance containing the data the SlashCommand interaction should be replied with
      */
-    public abstract @NotNull InteractionResponse reply(Member member, String[] args, SlashCommandEvent event);
+    public abstract @NotNull InteractionResponse reply(Member member, String[] args, SlashCommandInteractionEvent event);
 
     /**
      * The SlashExecutor onCommand() instance first calls the SlashExecutor#reply() method and then calls the
@@ -43,7 +43,7 @@ public abstract class SlashExecutor implements Executor {
      */
     @Override
     public final void onCommand(Member member, String[] args, Event event) {
-        SlashCommandEvent slashEvent = (SlashCommandEvent) event;
+        SlashCommandInteractionEvent slashEvent = (SlashCommandInteractionEvent) event;
 
         InteractionResponse response = reply(member, args, slashEvent);
         InteractionHook responseHook = null;

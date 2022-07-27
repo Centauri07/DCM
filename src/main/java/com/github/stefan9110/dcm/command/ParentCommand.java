@@ -20,7 +20,7 @@ import com.github.stefan9110.dcm.command.exceptions.CommandAlreadyExistsExceptio
 import com.github.stefan9110.dcm.permission.CustomPermission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -75,7 +75,7 @@ public abstract class ParentCommand implements Command {
     }
 
     /**
-     * @return Whether or not the ParentCommand should be registered through JDA as a SlashCommand or not.
+     * @return Whether the ParentCommand should be registered through JDA as a SlashCommand or not.
      */
     public boolean isSlashCommand() {
         return isSlashCommand;
@@ -106,7 +106,7 @@ public abstract class ParentCommand implements Command {
     /**
      * Method used to obtain a specific sub-command registered in the ParentCommand instance.
      *
-     * @param name The identifier name of the sub-command that shall be returned. This parameter String is case insensitive.
+     * @param name The identifier name of the sub-command that shall be returned. This parameter String is case-insensitive.
      * @return The Command registered through the identifier name given by the String parameter in the ParentCommand instance. If there is no
      * such command registered through the identifier given as parameter the method will return null.
      */
@@ -128,15 +128,20 @@ public abstract class ParentCommand implements Command {
     /**
      * Method used to obtain a sub-command from the List of sub-commands registered in the ParentCommand instance.
      *
-     * @param key This parameter can contain either the name of the sub-command or an alias of it. The given String is case insensitive.
+     * @param key This parameter can contain either the name of the sub-command or an alias of it. The given String is case-insensitive.
      * @return The sub-command having the given key parameter as its name identifier or one of its aliases. If there is no such Command found
      * the method will return null.
      */
-    public Command identifySubCommand(String key) {
-        for (String it : subCommands.keySet()) {
-            Command cmd = subCommands.get(it);
+    public Command identifySubCommand(String group, String key) {
+        if (key == null) return null;
+
+        ParentCommand parent = subCommands.get(group) != null ? (ParentCommand) subCommands.get(group) : this;
+
+        for (String it : parent.subCommands.keySet()) {
+            Command cmd = parent.subCommands.get(it);
             if (cmd.getName().equals(key.toLowerCase()) || cmd.getAliases().contains(key.toLowerCase())) return cmd;
         }
+
         return null;
     }
 
@@ -153,18 +158,19 @@ public abstract class ParentCommand implements Command {
      */
     public void execute(Member memberExecutor, String[] args, Event executeEvent) {
         if (getRequiredPermission() != null && !getRequiredPermission().hasPermission(memberExecutor)) {
-            if (executeEvent instanceof SlashCommandEvent)
-                ((SlashCommandEvent) executeEvent).reply(getRequiredPermission().noPermissionMessage()).setEphemeral(true).queue();
+            if (executeEvent instanceof SlashCommandInteractionEvent)
+                ((SlashCommandInteractionEvent) executeEvent).reply(getRequiredPermission().noPermissionMessage()).setEphemeral(true).queue();
             return;
         }
-        if (args.length > 0 && subCommands.containsKey(args[0].toLowerCase())) {
-            Command toExecute = identifySubCommand(args[0].toLowerCase());
+        if (args[1] != null) {
+            Command toExecute = identifySubCommand(args[0], args[1].toLowerCase());
+
             if (toExecute instanceof ParentCommand)
-                ((ParentCommand) toExecute).execute(memberExecutor, Arrays.copyOfRange(args, 1, args.length), executeEvent);
+                ((ParentCommand) toExecute).execute(memberExecutor, Arrays.copyOfRange(args, 2, args.length), executeEvent);
             else if (toExecute instanceof SubCommand)
-                ((SubCommand) toExecute).execute(memberExecutor, Arrays.copyOfRange(args, 1, args.length), executeEvent);
+                ((SubCommand) toExecute).execute(memberExecutor, Arrays.copyOfRange(args, 2, args.length), executeEvent);
             else
-                toExecute.getExecutor().onCommand(memberExecutor, Arrays.copyOfRange(args, 1, args.length), executeEvent);
+                toExecute.getExecutor().onCommand(memberExecutor, Arrays.copyOfRange(args, 2, args.length), executeEvent);
             return;
         }
         getExecutor().onCommand(memberExecutor, args, executeEvent);
@@ -174,7 +180,7 @@ public abstract class ParentCommand implements Command {
      * Method used to register the ParentCommand as a top of the hierarchy ParentCommand.
      * This method also caches the ParentCommand in the HashMap cache of the hierarchy commands.
      *
-     * @param slashCommand Whether or not the ParentCommand should be registered with a SlashCommand implementation requirement.
+     * @param slashCommand Whether the ParentCommand should be registered with a SlashCommand implementation requirement.
      * @throws CommandAlreadyExistsException if the ParentCommand instance is already registered or there already exists a Command with the
      *                                       given name identifier.
      */
@@ -187,7 +193,7 @@ public abstract class ParentCommand implements Command {
     /**
      * Method used to obtain any top of the hierarchy ParentCommand by its identifier from the HashMap cache.
      *
-     * @param name The name identifier String of the ParentCommand that shall be obtained. This identifier is case insensitive.
+     * @param name The name identifier String of the ParentCommand that shall be obtained. This identifier is case-insensitive.
      * @return The ParentCommand registered in the cache with the give name identifier. If there is no such command registered with this
      * identifier the method will return null.
      */

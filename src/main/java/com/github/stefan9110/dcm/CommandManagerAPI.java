@@ -16,15 +16,14 @@
 
 package com.github.stefan9110.dcm;
 
-
 import com.github.stefan9110.dcm.command.Command;
 import com.github.stefan9110.dcm.command.ParentCommand;
-import com.github.stefan9110.dcm.permission.DiscordPermission;
 import com.github.stefan9110.dcm.manager.CommandManager;
 import com.github.stefan9110.dcm.manager.executor.SlashExecutor;
 import com.github.stefan9110.dcm.exceptions.APIAlreadyInitializedException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,6 +33,7 @@ public class CommandManagerAPI {
     // Global instance of the API
     private static CommandManagerAPI commandManagerAPI;
 
+    private Message noPermissionMessage;
     private final String commandPrefix;
     private final CommandManager commandManager;
 
@@ -104,8 +104,8 @@ public class CommandManagerAPI {
      *
      * @param message The String containing the no-permission message.
      */
-    public CommandManagerAPI setNoPermissionMessage(String message) {
-        DiscordPermission.setNoPermissionMessage(message);
+    public CommandManagerAPI setNoPermissionMessage(Message message) {
+        noPermissionMessage = message;
         return this;
     }
 
@@ -122,6 +122,10 @@ public class CommandManagerAPI {
         if (commandManagerAPI != null) throw new APIAlreadyInitializedException();
         commandManagerAPI = new CommandManagerAPI(jda, commandPrefix);
         return commandManagerAPI;
+    }
+
+    public Message getNoPermissionMessage() {
+        return noPermissionMessage;
     }
 
     public static CommandManagerAPI getAPI() {

@@ -57,7 +57,7 @@ public interface Command {
 
     /**
      * Method used to obtain the usage of the command registered through the interface.
-     * No limitations sets to the formation / length of the String.
+     * No limitation sets to the formation / length of the String.
      * To be noted: the String may be used in embed forms so proper indentation for embeds is required.
      * Example of command usage: "at!test [requiredArgument] <optionalArgument>.
      *
@@ -77,7 +77,7 @@ public interface Command {
 
     /**
      * The method is used to obtain the arguments of the command registered through the interface.
-     * The value returned is used in the ShlashCommand registration of the command.
+     * The value returned is used in the SlashCommand registration of the command.
      * The values stored in the List shall respect the JDA implementations of the CommandArgument class.
      * In the case of a command not containing any predefined arguments the method shall return an empty List.
      *

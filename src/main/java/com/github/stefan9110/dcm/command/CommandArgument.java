@@ -29,7 +29,7 @@ public class CommandArgument {
      * @param type The JDA enum for the type of data given to the argument.
      * @param name The name of the argument. The String shall be lowercase and unique due to SlashCommand implementations.
      * @param description The description of the argument. SlashCommand implementation limitations required.
-     * @param required Whether or not the argument is required in the SlashCommand usage of the argument.
+     * @param required Whether the argument is required in the SlashCommand usage of the argument.
      */
     public CommandArgument(OptionType type, String name, String description, boolean required) {
         this.type = type;
@@ -54,7 +54,7 @@ public class CommandArgument {
     }
 
     /**
-     * @return Whether or not this argument is required to be filled in the command it's used in.
+     * @return Whether this argument is required to be filled in the command it's used in.
      */
     public boolean isRequired() {
         return required;

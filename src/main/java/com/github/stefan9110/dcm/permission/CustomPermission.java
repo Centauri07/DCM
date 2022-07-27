@@ -17,6 +17,7 @@
 package com.github.stefan9110.dcm.permission;
 
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 
 public interface CustomPermission {
     /**
@@ -34,5 +35,5 @@ public interface CustomPermission {
      *
      * @return The String containing the no permission message
      */
-    String noPermissionMessage();
+    Message noPermissionMessage();
 }

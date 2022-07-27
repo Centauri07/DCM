@@ -19,7 +19,7 @@ package com.github.stefan9110.dcm.command;
 import com.github.stefan9110.dcm.permission.CustomPermission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public abstract class SubCommand implements Command {
 
     /**
      * Method used to obtain the required permission to execute the SubCommand.
-     * @return The requested permission. If the SubCommand does not required a permission to be executed the method shall return null.
+     * @return The requested permission. If the SubCommand does not require a permission to be executed the method shall return null.
      */
     public abstract CustomPermission getRequiredPermission();
 
@@ -77,8 +77,8 @@ public abstract class SubCommand implements Command {
      */
     public void execute(Member memberExecutor, String[] args, Event executeEvent) {
         if (getRequiredPermission() != null && !getRequiredPermission().hasPermission(memberExecutor)) {
-            if (executeEvent instanceof SlashCommandEvent)
-                ((SlashCommandEvent) executeEvent).reply(getRequiredPermission().noPermissionMessage()).setEphemeral(true).queue();
+            if (executeEvent instanceof SlashCommandInteractionEvent)
+                ((SlashCommandInteractionEvent) executeEvent).reply(getRequiredPermission().noPermissionMessage()).setEphemeral(true).queue();
             return;
         }
         getExecutor().onCommand(memberExecutor, args, executeEvent);
