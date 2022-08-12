@@ -18,10 +18,13 @@ package com.github.stefan9110.dcm.command;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
+import java.util.List;
+
 public class CommandArgument {
     private final OptionType type;
     private final String name, description;
     private final boolean required;
+    private final List<?> autoComplete;
 
     /**
      * Constructor used to initialize an argument of a command given to a Command interface instance.
@@ -31,11 +34,17 @@ public class CommandArgument {
      * @param description The description of the argument. SlashCommand implementation limitations required.
      * @param required Whether the argument is required in the SlashCommand usage of the argument.
      */
-    public CommandArgument(OptionType type, String name, String description, boolean required) {
+    public CommandArgument(OptionType type, String name, String description, boolean required, List<?> autoComplete) {
         this.type = type;
         this.name = name.toLowerCase();
         this.description = description;
         this.required = required;
+
+        if (type != OptionType.STRING && type != OptionType.NUMBER && type != OptionType.INTEGER) {
+            throw new IllegalArgumentException("Argument type cannot have an autocomplete!");
+        }
+
+        this.autoComplete = autoComplete;
     }
 
     /**
@@ -58,6 +67,10 @@ public class CommandArgument {
      */
     public boolean isRequired() {
         return required;
+    }
+
+    public List<?> getAutoComplete() {
+        return autoComplete;
     }
 
     /**

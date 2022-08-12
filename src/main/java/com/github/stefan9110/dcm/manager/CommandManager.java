@@ -20,6 +20,7 @@ import com.github.stefan9110.dcm.command.Command;
 import com.github.stefan9110.dcm.command.ParentCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
@@ -29,7 +30,10 @@ import net.dv8tion.jda.api.interactions.commands.build.*;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CommandManager {
     private Guild registeredGuild;
@@ -92,15 +96,35 @@ public class CommandManager {
 
     }
 
+    @SubscribeEvent
+    public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent e) {
+        ParentCommand command = ParentCommand.getParentCommand(e.getName());
+
+        if (command == null) return;
+
+        List<?> autoComplete = command.identifyArgumentAutocomplete(e.getSubcommandGroup(), e.getSubcommandName(), e.getFocusedOption().getName());
+
+        if (autoComplete != null) {
+
+            List<?> options = autoComplete.stream().filter(word -> word.toString().startsWith(e.getFocusedOption().getValue())).collect(Collectors.toList());
+
+            switch (e.getFocusedOption().getType()) {
+                case STRING -> e.replyChoiceStrings((Collection<String>) options).queue();
+                case INTEGER -> e.replyChoiceLongs(((Collection<Number>) options).stream().map(Number::longValue).collect(Collectors.toList())).queue();
+                case NUMBER -> e.replyChoiceDoubles(((Collection<Number>) options).stream().map(Number::doubleValue).collect(Collectors.toList())).queue();
+            }
+        }
+    }
+
     // Method used to obtain the SlashCommand implementation data from a given ParentCommand
     private static SlashCommandData getCommandData(ParentCommand parent) {
         SlashCommandData cmdData = Commands.slash(parent.getName(), parent.getDescription() == null ? parent.getName() : parent.getDescription());
 
-        cmdData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(parent.getRequiredPermission()));
+        if (parent.getRequiredPermission() != null) cmdData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(parent.getRequiredPermission()));
 
         // If the command doesn't have any sub-commands we will add its own CommandArgument data in the SlashCommand implementation
         if (parent.getSubCommands().isEmpty()) {
-            parent.getArguments().forEach(arg -> cmdData.addOption(arg.getType(), arg.getName(), arg.getDescription(), arg.isRequired()));
+            parent.getArguments().forEach(arg -> cmdData.addOption(arg.getType(), arg.getName(), arg.getDescription(), arg.isRequired(), arg.getAutoComplete() != null));
             return cmdData;
         }
 
@@ -113,14 +137,14 @@ public class CommandManager {
 
                 ((ParentCommand) sb).getSubCommands().forEach((name, command) -> {
                     SubcommandData sbData = new SubcommandData(command.getName(), command.getDescription());
-                    command.getArguments().forEach(arg -> sbData.addOption(arg.getType(), arg.getName(), arg.getDescription(), arg.isRequired()));
+                    command.getArguments().forEach(arg -> sbData.addOption(arg.getType(), arg.getName(), arg.getDescription(), arg.isRequired(), arg.getAutoComplete() != null));
                     sbgData.addSubcommands(sbData);
                 });
 
                 subcommandGroupData.add(sbgData);
             } else {
                 SubcommandData sbData = new SubcommandData(sb.getName(), sb.getDescription());
-                sb.getArguments().forEach(arg -> sbData.addOption(arg.getType(), arg.getName(), arg.getDescription(), arg.isRequired()));
+                sb.getArguments().forEach(arg -> sbData.addOption(arg.getType(), arg.getName(), arg.getDescription(), arg.isRequired(), arg.getAutoComplete() != null));
                 subCommandData.add(sbData);
             }
         }

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class ParentCommand implements Command {
     /**
@@ -142,6 +143,18 @@ public abstract class ParentCommand implements Command {
         }
 
         return null;
+    }
+
+    public List<?> identifyArgumentAutocomplete(String group, String key, String argumentName) {
+        Command command = identifySubCommand(group, key);
+
+        if (command == null) command = this;
+
+        if (command.getArguments() == null) return null;
+
+        return command.getArguments().stream().filter( argument ->
+            argument.getName().equals(argumentName)
+        ).findFirst().map(CommandArgument::getAutoComplete).orElse(null);
     }
 
     /**
