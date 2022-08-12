@@ -17,10 +17,9 @@
 package com.github.stefan9110.dcm.command;
 
 import com.github.stefan9110.dcm.command.exceptions.CommandAlreadyExistsException;
-import com.github.stefan9110.dcm.permission.CustomPermission;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -64,7 +63,7 @@ public abstract class ParentCommand implements Command {
      * @return The CustomPermission required to execute the Command. If the return value is null, the ParentCommand does not require
      * any permission to be executed.
      */
-    public abstract CustomPermission getRequiredPermission();
+    public abstract List<Permission> getRequiredPermission();
 
     /**
      * @return The List of CommandArgument used for the SlashCommand JDA implementation of the ParentCommand
@@ -157,11 +156,7 @@ public abstract class ParentCommand implements Command {
      * @param executeEvent   The event that registered tha call through the JDA event system.
      */
     public void execute(Member memberExecutor, String[] args, Event executeEvent) {
-        if (getRequiredPermission() != null && !getRequiredPermission().hasPermission(memberExecutor)) {
-            if (executeEvent instanceof SlashCommandInteractionEvent)
-                ((SlashCommandInteractionEvent) executeEvent).reply(getRequiredPermission().noPermissionMessage()).setEphemeral(true).queue();
-            return;
-        }
+
         if (args[1] != null) {
             Command toExecute = identifySubCommand(args[0], args[1].toLowerCase());
 

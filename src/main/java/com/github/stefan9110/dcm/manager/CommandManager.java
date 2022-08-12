@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 
 import javax.annotation.Nonnull;
@@ -94,6 +95,8 @@ public class CommandManager {
     // Method used to obtain the SlashCommand implementation data from a given ParentCommand
     private static SlashCommandData getCommandData(ParentCommand parent) {
         SlashCommandData cmdData = Commands.slash(parent.getName(), parent.getDescription() == null ? parent.getName() : parent.getDescription());
+
+        cmdData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(parent.getRequiredPermission()));
 
         // If the command doesn't have any sub-commands we will add its own CommandArgument data in the SlashCommand implementation
         if (parent.getSubCommands().isEmpty()) {

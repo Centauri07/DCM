@@ -22,7 +22,7 @@ import com.github.stefan9110.dcm.command.ParentCommand;
 import com.github.stefan9110.dcm.command.SubCommand;
 import com.github.stefan9110.dcm.command.exceptions.CommandAlreadyExistsException;
 import com.github.stefan9110.dcm.manager.executor.Executor;
-import com.github.stefan9110.dcm.permission.CustomPermission;
+import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class CommandBuilder {
     private final String name;
     private String description, usage;
     private Executor executor;
-    private CustomPermission requiredPermission;
+    private List<Permission> requiredPermission;
     private final HashMap<String, Command> subCommands;
     private final List<CommandArgument> arguments;
     private final List<String> aliases;
@@ -163,7 +163,21 @@ public class CommandBuilder {
      * @param perm The CustomPermission required to execute the Command.
      * @return The same CommandBuilder instance containing the modified data.
      */
-    public CommandBuilder setRequiredPermission(CustomPermission perm) {
+    public CommandBuilder setRequiredPermission(Permission... perm) {
+        setRequiredPermission(Arrays.asList(perm));
+        return this;
+    }
+
+    /**
+     * Sets the required permission to use the built Command.
+     * The CustomPermission interface contains a method to check if a JDA Member instance has the permission to
+     * execute the Command in the given permission.
+     * Example of custom permission: CustomPermission enum
+     *
+     * @param perm The CustomPermission required to execute the Command.
+     * @return The same CommandBuilder instance containing the modified data.
+     */
+    public CommandBuilder setRequiredPermission(List<Permission> perm) {
         this.requiredPermission = perm;
         return this;
     }
@@ -178,7 +192,7 @@ public class CommandBuilder {
         return parentCommand ?
                 new ParentCommand(name, subCommands, arguments) {
                     @Override
-                    public CustomPermission getRequiredPermission() {
+                    public List<Permission> getRequiredPermission() {
                         return requiredPermission;
                     }
 
@@ -204,7 +218,7 @@ public class CommandBuilder {
                 } :
                 new SubCommand(name, arguments) {
                     @Override
-                    public CustomPermission getRequiredPermission() {
+                    public List<Permission> getRequiredPermission() {
                         return requiredPermission;
                     }
 
