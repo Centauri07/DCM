@@ -18,6 +18,7 @@ package com.github.stefan9110.dcm.manager.executor.reply;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.interactions.components.Modal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -27,12 +28,13 @@ import static com.github.stefan9110.dcm.manager.executor.reply.InteractionRespon
 
 public class InteractionResponse {
     public enum ResponseType {
-        STRING, MESSAGE, EMBED, DEFFER
+        STRING, MESSAGE, EMBED, MODAL, DEFFER
     }
 
     private String stringResponse;
     private Message messageResponse;
     private List<MessageEmbed> embedResponse;
+    private Modal modalResponse;
     private boolean ephemeral = false;
 
     @NotNull
@@ -51,6 +53,11 @@ public class InteractionResponse {
     private InteractionResponse(MessageEmbed... embeds) {
         embedResponse = Arrays.asList(embeds);
         responseType = EMBED;
+    }
+
+    private InteractionResponse(Modal modal) {
+        modalResponse = modal;
+        responseType = MODAL;
     }
 
     private InteractionResponse() {
@@ -74,6 +81,10 @@ public class InteractionResponse {
         return new InteractionResponse(embeds);
     }
 
+    public static InteractionResponse of(Modal modal) {
+        return new InteractionResponse(modal);
+    }
+
     public static InteractionResponse deferInteraction() {
         return new InteractionResponse();
     }
@@ -88,6 +99,10 @@ public class InteractionResponse {
 
     public Message getMessageResponse() {
         return messageResponse;
+    }
+
+    public Modal getModalResponse() {
+        return modalResponse;
     }
 
     public @NotNull ResponseType getResponseType() {

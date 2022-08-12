@@ -60,6 +60,10 @@ public abstract class SlashExecutor implements Executor {
                 responseHook = slashEvent.reply(response.getMessageResponse()).setEphemeral(response.isEphemeral()).complete();
                 break;
             }
+            case MODAL: {
+                slashEvent.replyModal(response.getModalResponse()).complete();
+                break;
+            }
             case DEFFER: {
                 responseHook = slashEvent.deferReply().setEphemeral(response.isEphemeral()).complete();
                 break;
