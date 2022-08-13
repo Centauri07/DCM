@@ -108,9 +108,9 @@ public class CommandManager {
             List<?> options = autoComplete.stream().filter(word -> word.toString().startsWith(e.getFocusedOption().getValue())).collect(Collectors.toList());
 
             switch (e.getFocusedOption().getType()) {
-                case STRING -> e.replyChoiceStrings((Collection<String>) options).queue();
-                case INTEGER -> e.replyChoiceLongs(((Collection<Number>) options).stream().map(Number::longValue).collect(Collectors.toList())).queue();
-                case NUMBER -> e.replyChoiceDoubles(((Collection<Number>) options).stream().map(Number::doubleValue).collect(Collectors.toList())).queue();
+                case STRING -> { e.replyChoiceStrings((Collection<String>) options).queue(); }
+                case INTEGER -> { e.replyChoiceLongs(((Collection<Number>) options).stream().map(Number::longValue).collect(Collectors.toList())).queue(); }
+                case NUMBER -> { e.replyChoiceDoubles(((Collection<Number>) options).stream().map(Number::doubleValue).collect(Collectors.toList())).queue(); }
             }
         }
     }
