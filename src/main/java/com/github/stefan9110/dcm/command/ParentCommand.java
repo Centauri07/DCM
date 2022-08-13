@@ -181,7 +181,8 @@ public abstract class ParentCommand implements Command {
                 toExecute.getExecutor().onCommand(memberExecutor, Arrays.copyOfRange(args, 2, args.length), executeEvent);
             return;
         }
-        getExecutor().onCommand(memberExecutor, args, executeEvent);
+
+        getExecutor().onCommand(memberExecutor, Arrays.copyOfRange(args, 2, args.length), executeEvent);
     }
 
     /**
