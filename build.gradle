@@ -22,6 +22,12 @@ test {
     useJUnitPlatform()
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
